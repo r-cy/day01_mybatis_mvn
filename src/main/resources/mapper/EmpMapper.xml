@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace接口的全路径，用于关联dao层接口-->
+<mapper namespace="com.jxd.mybatis.dao.IEmpDao">
+    <!--当数据库的字段名称和实体类的属性名称不一致，需要单独映射-->
+    <resultMap id="emp" type="Emp">
+        <!--property代表实体类的属性名称-->
+        <!--column代表数据库字段名称-->
+        <!--id名称用于设置主键-->
+        <result property="empno" column="empno"/>
+        <result property="ename" column="ename"/>
+        <result property="job" column="job"/>
+    </resultMap>
+
+    <!--使用sql标签定义公共的查询内容-->
+    <sql id="baseSql">
+        empno,ename,job
+    </sql>
+
+    <!--id对应的是dao接口方法的名称-->
+    <!--resultType对应的返回值的类型，一条记录返回对应的类型-->
+    <!--<select id="selectAll" resultType="com.jxd.mybatis.model.Emp">-->
+    <!--<select id="selectAll" resultType="Emp">
+        select empno,ename,job from emps
+    </select>-->
+    <!--<select id="selectAll" resultMap="emp">
+        select empno,ename,job from emps
+    </select>-->
+    <select id="selectAll" resultMap="emp"><!--emp为上方resultMap的id-->
+        select
+        <include refid="baseSql"></include>
+        from emps
+        <!--判断ename参数是否为null或者是否为空字符串-->
+        <if test="ename != null and ename !=''">
+            where ename like concat('%',#{ename},'%')
+        </if>
+    </select>
+
+    <select id="selectByEnameAndJob" resultMap="emp">
+        select empno,ename,job from emps
+        <where>
+            <if test="ename != null and ename != ''">
+                ename like concat('%',#{ename},"%")
+            </if>
+            <if test="job != null and job != ''">
+                and job like concat('%',#{job},"%")
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByJob" resultMap="emp">
+        select empno,ename,job from emps
+        <choose>
+            <when test="job != null and job != ''">
+                where job = #{job}
+            </when>
+            <otherwise>
+                where job = 'cleaner'
+            </otherwise>
+        </choose>
+    </select>
+
+    <!--排序查询-->
+    <select id="selectAllInorder" resultMap="emp">/*emp为上方resultMap的id*/
+        /*不加@Param注解用value，不能随意填写字段*/
+        <!--select
+        <include refid="baseSql"></include>
+        from emps order by ${value}-->
+        select
+        <include refid="baseSql"></include>
+        from emps order by ${colName}
+    </select>
+
+    <!--模糊查询-->
+    <select id="selectByName" resultType="Emp">/*emp为上方resultMap的id*/
+        <!--select
+        <include refid="baseSql"></include>
+        from emps where ename like concat('%',#{ename},'%')-->
+        select
+        <include refid="baseSql"></include>
+        from emps where ename like '%' #{ename} '%'
+    </select>
+
+    <!--MySQL查询分页-->
+    <select id="selectByPage" resultMap="emp">
+        select * from emps limit #{pageStart},#{pageSize}
+    </select>
+
+    <!--Oracle的分页查询-->
+    <!--<select id="selByPage">
+        select * from
+        (select rownum r,emp.* from emp) t
+        where t.r gt; #{pageStart} and t.r lt; #{pageEnd}
+    </select>-->
+    <!--通过一个字段查询-->
+    <select id="selectById" resultType="Emp">
+        select
+        <include refid="baseSql"></include>
+        /*from emps where empno = #{empno}*/
+        from emps where empno = #{aaa}
+    </select>
+
+    <!--通过两个字段查询-->
+    <select id="selectByIdAndName" resultType="Emp">
+        select
+        <include refid="baseSql"></include>
+        from emps where empno = #{empno} and ename = #{ename}
+    </select>
+
+
+    <update id="updateEmp" parameterType="Emp">
+        update emps set job = #{job}, ename = #{ename} where empno = #{empno}
+    </update>
+
+    <delete id="deleteByEmpno">
+        delete from emps where empno in
+        <!--array是mybatis对数组参数指定的key值-->
+        <foreach collection="array" item="empno" separator="," open="(" close=")">
+            #{empno}
+        </foreach>
+
+    </delete>
+</mapper>

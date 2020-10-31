@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <!--引入属性文件-->
+    <properties resource="db.properties">
+        <!--直接在当前文件中定义，直接引用即可-->
+        <!--<property name="username" value="root"/>-->
+    </properties>
+
+    <settings>
+        <!--开启驼峰命名的自动映射-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!--设置mybatis的日志实现-->
+        <setting name="logImpl" value="LOG4J"/>
+    </settings>
+
+    <typeAliases>
+        <!--设置实体类的别名-->
+        <typeAlias type="com.jxd.mybatis.model.Emp" alias="Emp"/>
+        <typeAlias type="com.jxd.mybatis.model.Employee" alias="Employee"/>
+    </typeAliases>
+
+    <environments default="development">
+        <environment id="development">
+            <!--事务管理采用JDBC方式-->
+            <transactionManager type="JDBC" />
+            <!--配置连接池方式的数据源-->
+            <dataSource type="POOLED">
+                <!--根据数据库连接四大参数创建连接放入连接池-->
+                <!--<property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://127.0.0.1:3306/mysql"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="root"/>-->
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!--注册mapper文件,告诉mybatis去哪里找sql语句-->
+    <mappers>
+        <mapper resource="mapper/EmpMapper.xml"></mapper>
+        <mapper resource="mapper/EmployeeMapper.xml"></mapper>
+        <mapper resource="mapper/CommandMapper.xml"></mapper>
+        <mapper resource="mapper/MsgMapper.xml"></mapper>
+    </mappers>
+
+
+</configuration>

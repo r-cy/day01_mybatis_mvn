@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace接口的全路径，用于关联dao层接口-->
+<mapper namespace="com.jxd.mybatis.dao.IEmployeeDao">
+
+    <!--一对一或者多对一的映射方式一-->
+    <!--<resultMap id="empWithDept" type="Employee">
+        <id column="empno" property="empno"/>
+        <result column="ename" property="ename"/>
+        <result column="job" property="job"/>
+        <result column="deptno" property="deptno"/>
+        <result column="deptno" property="dept.deptno"/>
+        <result column="dname" property="dept.dname"/>
+    </resultMap>-->
+
+    <!--一对一或者多对一的映射方式二-->
+    <!--针对部门表进行结果映射-->
+    <resultMap id="dept" type="com.jxd.mybatis.model.Dept">
+        <id property="deptno" column="deptno"/>
+        <result property="dname" column="dname"/>
+    </resultMap>
+    <!--针对员工表进行结果映射-->
+    <resultMap id="empWithDept" type="Employee">
+        <id column="empno" property="empno"/>
+        <result column="ename" property="ename"/>
+        <result column="job" property="job"/>
+        <result column="deptno" property="deptno"/>
+        <!--第一个dept代表dept属性名称，第二个dept代表的已经封装好的结果集的id-->
+        <association property="dept" resultMap="dept"/>
+    </resultMap>
+
+    <select id="selectWithDept" resultMap="empWithDept">
+        select empno,ename,job,e.deptno,dname from emps e
+        left join dept d on e.deptno = d.deptno
+        where e.deptno is not null
+    </select>
+
+    <!--通过将结果直接封装为map的方式实现一对一映射，不依赖任何的resultMap-->
+    <select id="selectWithDeptByMap" resultType="java.util.HashMap">
+        select empno,ename,job,e.deptno,dname from emps e
+        left join dept d on e.deptno = d.deptno
+        where e.deptno is not null
+    </select>
+</mapper>

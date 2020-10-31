@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace接口的全路径，用于关联dao层接口-->
+<mapper namespace="com.jxd.mybatis.dao.IMsgDao">
+    <insert id="insertBatch">
+        insert into msg (content,cid) values
+        <foreach collection="msgList" item="msg" separator=",">
+            (#{msg.content},#{msg.cid})
+        </foreach>
+    </insert>
+
+    <update id="updataBatch" parameterType="java.util.List">
+        update msg
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="content = case" suffix="end,">
+                <foreach collection="list" item="msg" index="index">
+                    <if test="msg.mid!=null">
+                        when mid=#{msg.mid} then #{msg.content}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        where mid in
+        <foreach collection="list"  item="msg" index="index" open="(" separator="," close=")">
+            #{msg.mid}
+        </foreach>
+    </update>
+</mapper>

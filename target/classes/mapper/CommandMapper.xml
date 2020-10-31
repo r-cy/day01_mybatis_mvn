@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace接口的全路径，用于关联dao层接口-->
+<mapper namespace="com.jxd.mybatis.dao.ICommandDao">
+    <!--先封装消息对象-->
+    <resultMap id="msg" type="com.jxd.mybatis.model.Msg">
+        <id column="mid" property="mid"/>
+        <result column="content" property="content"/>
+    </resultMap>
+    <!--封装命令对象-->
+    <resultMap id="commandWithMsg" type="com.jxd.mybatis.model.Command">
+        <id column="cid" property="cid"/>
+        <result column="cname" property="cname"/>
+        <result column="description" property="description"/>
+        <!--用于设置集合类型成员变量，property代表属性名称，resultMap引用已经封装好的mapid-->
+        <collection property="msgList" resultMap="msg"/>
+    </resultMap>
+
+    <select id="getOneCommandWithMsg" resultMap="commandWithMsg">
+        select c.cid,c.cname,c.description,m.mid,m.content
+        from command c left join msg m
+        on c.cid = m.cid
+        where c.cid = #{cid}
+    </select>
+</mapper>
